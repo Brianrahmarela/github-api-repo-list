@@ -26,6 +26,7 @@ function App() {
 		setLoading(false);
 
 		setRepoData((prev) => [...prev, ...resultsCut]);
+		// eslint-disable-next-line
 	}, [repoData2]);
 
 	const changeWindowSize = () => {
@@ -53,7 +54,8 @@ function App() {
 			const scrolled = window.scrollY;
 
 			if (scrolled === scrollable) {
-				//set timeout to looking simulation animation loading component when fetch data from api
+				//infinite scroll animation loading with set timeout
+				setLoading(true);
 				setTimeout(function () {
 					fetch("https://api.github.com/users/Brianrahmarela/repos")
 						.then((res) => res.json())
@@ -83,7 +85,7 @@ function App() {
 	}, []);
 
 	function repoDataUrl() {
-		//infinite scroll animation loading with set timeout
+		//set timeout to looking simulation animation loading component when fetch data from api
 		setLoading(true);
 		setTimeout(function () {
 			fetch("https://api.github.com/users/Brianrahmarela/repos")
@@ -114,7 +116,7 @@ function App() {
 					}
 				);
 			setLoading(false);
-		}, 200);
+		}, 500);
 	}
 
 	useEffect(() => {
