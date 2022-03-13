@@ -12,6 +12,8 @@ function App() {
 	});
 	console.log("state user", user);
 	const [repoData, setRepoData] = useState();
+	const [toogle, setToogle] = useState(false);
+	console.log("toogle", toogle);
 	console.log("state repoData", repoData);
 
 	async function repoDataUrl() {
@@ -25,7 +27,7 @@ function App() {
 							<ListGroup
 								key={index}
 								className="text-align-center "
-								style={{ width: "500px" }}
+								style={{ width: "300px" }}
 							>
 								<ListGroup.Item>
 									<a href={item.svn_url}>{item.name}</a>
@@ -34,7 +36,13 @@ function App() {
 						</>
 					));
 					console.log("list res", list);
-					setRepoData(list);
+					if (toogle === false) {
+						setRepoData(list);
+						setToogle(true);
+					} else {
+						setRepoData("");
+						setToogle(false);
+					}
 				},
 				(error) => {
 					console.log(error);
@@ -71,9 +79,15 @@ function App() {
 				<Card.Body>
 					<Card.Title>{user.name}</Card.Title>
 					<Card.Text>{user.bio}</Card.Text>
-					<Button variant="primary" onClick={repoDataUrl}>
-						Get All List Repository
-					</Button>
+					{toogle ? (
+						<Button variant="primary" onClick={repoDataUrl}>
+							Hide
+						</Button>
+					) : (
+						<Button variant="primary" onClick={repoDataUrl}>
+							Show All Repository
+						</Button>
+					)}
 				</Card.Body>
 			</Card>
 			{repoData ? (
