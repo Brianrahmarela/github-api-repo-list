@@ -3,6 +3,7 @@ import "./App.css";
 import Card from "react-bootstrap/Card";
 import Button from "react-bootstrap/Button";
 import ListGroup from "react-bootstrap/ListGroup";
+import Spinner from "react-bootstrap/Spinner";
 
 function App() {
 	const [user, setUser] = useState({
@@ -12,10 +13,11 @@ function App() {
 	});
 	const [repoData, setRepoData] = useState([]);
 	const [repoData2, setRepoData2] = useState([]);
-	const [newData, setNewData] = useState([]);
+	const [loading, setLoading] = useState(false);
+	// const [newData, setNewData] = useState([]);
 	console.log("state repoData", repoData);
 	console.log("state repoData2", repoData2);
-	console.log("state newData", newData);
+	// console.log("state newData", newData);
 	const [toogle, setToogle] = useState(false);
 	console.log("state repoData", repoData);
 	const [screenSize, setScreenSize] = useState("sm");
@@ -24,31 +26,18 @@ function App() {
 
 	console.log("state repoData", repoData);
 	console.log("state repoData2", repoData2);
-	const isSame = (repoData, repoData2) =>
-		repoData.id === repoData2.id && repoData.name === repoData2.name;
-
-	const onlyInLeft = (left, right, compareFunction) =>
-		left.filter(
-			(leftValue) =>
-				!right.some((rightValue) => compareFunction(leftValue, rightValue))
-		);
-
-	const onlyInRepoData = onlyInLeft(repoData, repoData2, isSame);
-	// console.log("onlyInRepoData", onlyInRepoData);
-	const onlyInRepoData2 = onlyInLeft(repoData2, repoData, isSame);
-	// console.log("onlyInRepoData2", onlyInRepoData2);
-
-	let newDataList = [...onlyInRepoData, ...onlyInRepoData2];
-	console.log("newDataList", newDataList);
-
-	console.log("state repoDataaaa", repoData);
-
+	// function getNewData() {
+	// }
 	useEffect(() => {
-		setNewData((prev) => ({
-			...prev,
-			newDataList
-		}));
-	}, []);
+		let results = repoData2.filter(
+			({ id: id1 }) => !repoData.some(({ id: id2 }) => id2 === id1)
+		);
+		console.log("results", results);
+		const resultsCut = results.slice(0, 5);
+		setLoading(false);
+
+		setRepoData((prev) => [...prev, ...resultsCut]);
+	}, [repoData2]);
 
 	const changeWindowSize = () => {
 		if (window.innerWidth < 788) {
@@ -67,7 +56,15 @@ function App() {
 			window.removeEventListener("resize", changeWindowSize);
 		};
 	});
+	// let timeout;
 
+	// function myFunction() {
+	// 	timeout = setTimeout(alertFunc, 1000);
+	// }
+
+	// function alertFunc() {
+	// 	alert("Hello!");
+	// }
 	useEffect(() => {
 		window.addEventListener("scroll", () => {
 			const scrollable =
@@ -81,6 +78,12 @@ function App() {
 					.then((res) => res.json())
 					.then(
 						(result) => {
+							setLoading(true);
+
+							var timeoutID = setTimeout(function () {
+								console.log("setTimeout 5 secondi");
+								setLoading(false);
+							}, 5000);
 							// console.log("REPO LIST RES 2!", result);
 							let list2 = result.map((item) => {
 								return {
@@ -94,8 +97,9 @@ function App() {
 							let filterList = list2.map((item, idx) => {
 								return item;
 							});
-							console.log("RESULT FILTER", filterList);
+							// console.log("RESULT FILTER", filterList);
 							setRepoData2(filterList);
+							// getNewData();
 							// const listCut = list.slice(0, 10);
 						},
 						(error) => {
@@ -104,9 +108,10 @@ function App() {
 					);
 			}
 		});
-	});
+	}, []);
 
 	async function repoDataUrl() {
+		setLoading(true);
 		await fetch("https://api.github.com/users/Brianrahmarela/repos")
 			.then((res) => res.json())
 			.then(
@@ -121,14 +126,16 @@ function App() {
 					});
 					console.log("list", list);
 
-					const listCut = list.slice(0, 10);
+					const listCut = list.slice(0, 5);
 					console.log("listCut 1-5", listCut);
 					if (toogle === false) {
 						setRepoData(listCut);
 						setToogle(true);
+						setLoading(false);
 					} else {
 						setRepoData([]);
 						setToogle(false);
+						setLoading(false);
 					}
 				},
 				(error) => {
@@ -177,6 +184,13 @@ function App() {
 					)}
 				</Card.Body>
 			</Card>
+			{/* {loading ? (
+				<Spinner animation="border" role="status">
+					<span className="visually-hidden">Loading...</span>
+				</Spinner>
+			) : (
+				""
+			)} */}
 			{repoData
 				? repoData.map((item) => (
 						<ListGroup
@@ -197,6 +211,13 @@ function App() {
 						</ListGroup>
 				  ))
 				: ""}
+			{loading ? (
+				<Spinner animation="border" role="status">
+					<div className="visually-hidden">Loading...</div>
+				</Spinner>
+			) : (
+				""
+			)}
 		</div>
 	);
 }
